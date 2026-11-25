@@ -15,6 +15,7 @@ build.py            stdlib-only generator -> dist/
 
 ```sh
 python build.py --check     # writes dist/ and asserts no placeholder leaked
+py check_links.py           # every internal link and anchor resolves
 python -m http.server -d dist 8000
 ```
 

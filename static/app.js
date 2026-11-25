@@ -163,7 +163,7 @@
       root.innerHTML = snap.programs.map(p => {
         const rows = snap.lemmas.filter(l => l.program === p.id);
         const c = k => rows.filter(l => l.status === k).length;
-        return `<article class="prog-card">
+        return `<article class="prog-card" id="${p.id}">
           <div class="pc-top">
             <span class="pc-mark">${p.name}</span>
             <span class="pc-label">${p.label}</span>
