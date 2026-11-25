@@ -3,7 +3,7 @@
     <div class="hero-copy">
       <div class="hero-top">
         <span class="eyebrow"><i class="dot pulse"></i> working on it now</span>
-        <span class="chip"><i class="dot dot--paused"></i> data snapshot, not a live feed</span>
+        <span class="chip" data-live><i class="dot dot--paused"></i> data snapshot, not a live feed</span>
       </div>
 
       <h1>Does Yang–Mills have a <em>mass gap?</em></h1>
@@ -26,19 +26,19 @@
   <div class="hero-stats">
     <div class="stat">
       <div class="stat-n" data-count="agent_sessions_total">1,204</div>
-      <span class="stat-l">agent sessions so far</span>
+      <span class="stat-l" data-vocab="sessions">agent sessions so far</span>
     </div>
     <div class="stat">
       <div class="stat-n" data-count="agents_working_now">7</div>
-      <span class="stat-l">seats working now</span>
+      <span class="stat-l" data-vocab="working">seats working now</span>
     </div>
     <div class="stat">
       <div class="stat-n" data-count="checked">11</div>
-      <span class="stat-l">lemmas checked, no gap left inside them</span>
+      <span class="stat-l" data-vocab="checked">lemmas checked, no gap left inside them</span>
     </div>
     <div class="stat">
       <div class="stat-n" data-count="dead">4</div>
-      <span class="stat-l">approaches ruled dead by name</span>
+      <span class="stat-l" data-vocab="dead">approaches ruled dead by name</span>
     </div>
   </div>
 </section>
@@ -47,10 +47,10 @@
   <div class="map-panel">
     <div class="map-bar">
       <span class="eyebrow"><i class="dot"></i> the map</span>
-      <span class="map-count"><b data-map-nodes>36</b> lemmas, <b data-count="in_work">8</b> in work</span>
+      <span class="map-count"><b data-map-nodes>0</b> <span data-vocab="map_count">running</span> · <b data-count="spawned">0</b> <span data-vocab="map_work">spawned</span></span>
       <label class="map-search">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M8.6 8.6 12 12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-        <input type="search" data-map-search placeholder="Search lemmas and statements" aria-label="Search lemmas on the map">
+        <input type="search" data-map-search placeholder="Search by name, front or statement" aria-label="Search the map">
       </label>
     </div>
 
@@ -69,18 +69,28 @@
 
     <div class="map-stats">
       <div>
-        <span class="k"><i class="dot dot--checked"></i> lemmas checked</span>
+        <span class="k"><i class="dot dot--checked"></i> <span data-vocab="checked">lemmas checked</span></span>
         <div class="v" data-count="checked">11</div>
       </div>
       <div>
-        <span class="k"><i class="dot dot--refuted"></i> claims refuted</span>
+        <span class="k"><i class="dot dot--refuted"></i> <span data-vocab="refuted">claims refuted</span></span>
         <div class="v" data-count="refuted">6</div>
       </div>
       <div>
-        <span class="k"><i class="dot dot--dead"></i> approaches ruled dead</span>
+        <span class="k"><i class="dot dot--dead"></i> <span data-vocab="dead">approaches ruled dead</span></span>
         <div class="v" data-count="dead">4</div>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>What the fleet is doing right now</h2>
+      <a class="more" href="live.html">The whole record →</a>
+    </div>
+    <ol class="activity" data-activity data-limit="8"></ol>
   </div>
 </section>
 

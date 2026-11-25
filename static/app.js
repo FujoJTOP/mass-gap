@@ -1,9 +1,9 @@
-/* Mass gap? — one script. Reads the snapshot embedded by build.py and renders
-   counters, the record, the board, programs, papers, the graveyard, and the map. */
+/* Mass gap? — one script. Reads the snapshot embedded by build.py, then polls
+   live.json (served by feed/livefeed.mjs) and re-renders when the session moves. */
 (() => {
   const tag = document.getElementById('fleet-data');
   if (!tag) return;
-  const snap = JSON.parse(tag.textContent);
+  let snap = JSON.parse(tag.textContent);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -11,13 +11,13 @@
   const fmt = n => n.toLocaleString('en-US');
   const KIND = {
     checked: 'checked', refuted: 'refuted', dead: 'dead', 'in-work': 'in-work',
-    started: 'started', status: 'status', note: 'note',
+    started: 'started', status: 'status', note: 'note', conjecture: 'conjecture',
   };
   const STATUS_LABEL = {
     checked: 'checked', refuted: 'refuted', 'in-work': 'in work',
-    conjecture: 'conjecture', dead: 'dead',
+    conjecture: 'open', dead: 'dead',
   };
-  const PROG = Object.fromEntries(snap.programs.map(p => [p.id, p]));
+  let PROG = Object.fromEntries(snap.programs.map(p => [p.id, p]));
 
   const ago = iso => {
     const s = (new Date(snap.generated_at) - new Date(iso)) / 1000;
@@ -52,14 +52,47 @@
     $$('[data-total]').forEach(node => { node.textContent = fmt(snap.events_through_seq); });
   }
 
+  /* vocabulary: the same page reads lemmas in the seed and subagents when live */
+  function renderVocab() {
+    const v = snap.vocab || {};
+    $$('[data-vocab]').forEach(node => {
+      const key = node.dataset.vocab;
+      if (v[key]) node.textContent = v[key];
+    });
+  }
+
+  /* what the fleet is doing right now ------------------------------------ */
+
+  function renderActivity() {
+    $$('[data-activity]').forEach(root => {
+      const rows = snap.running?.length ? snap.running : (snap.activity || []);
+      const limit = Number(root.dataset.limit || rows.length);
+      if (!rows.length) {
+        root.innerHTML = `<li class="act-empty">${snap.vocab?.idle || 'No subagent is running this second.'}${snap.idle_since ? ` · last move ${ago(snap.idle_since)}` : ''}</li>`;
+        return;
+      }
+      root.innerHTML = rows.slice(0, limit).map(r => `
+        <li class="act">
+          <span class="act-id">${r.id}</span>
+          <span class="act-front">${r.front ?? ''}</span>
+          <span class="act-doing">${r.doing}</span>
+          <span class="act-meta">${r.steps ? 'step ' + r.steps : ''}${r.tools ? ' · ' + r.tools + ' calls' : ''}${r.steps || r.tools ? ' · ' : ''}${ago(r.lastAt)}</span>
+        </li>`).join('');
+    });
+  }
+
+  const allNodes = () => [...(snap.lemmas || []), ...(snap.archive || [])];
+
   /* status --------------------------------------------------------------- */
 
   function renderStatus() {
     $$('[data-status]').forEach(root => {
       const p = PROG[snap.status.program];
+      const text = String(snap.status.text ?? '');
+      const shown = text.length > 340 ? text.slice(0, 338) + ' …' : text;
       root.innerHTML = `
-        <div class="seat">${snap.status.seat} · ${p ? p.name + ' · ' + p.title : ''}</div>
-        <p>${snap.status.text}</p>
+        <div class="seat">${snap.status.seat}${p ? ' · ' + p.name + ' · ' + p.title : ''}</div>
+        <p>${shown}</p>
         <div class="meta">
           <span>${ago(snap.status.at)}</span>
           <span>snapshot ${snap.generated_at.slice(0, 16).replace('T', ' ')} UTC</span>
@@ -97,8 +130,11 @@
       buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kind === kind)));
       renderFeed();
     };
-    buttons.forEach(b => b.addEventListener('click', () => draw(b.dataset.kind)));
-    draw('all');
+    if (!root.dataset.wired) {
+      root.dataset.wired = '1';
+      buttons.forEach(b => b.addEventListener('click', () => draw(b.dataset.kind)));
+    }
+    draw(root.dataset.filter || 'all');
   }
 
   /* board ---------------------------------------------------------------- */
@@ -108,40 +144,42 @@
     if (!root) return;
 
     const counts = {};
-    snap.lemmas.forEach(l => { counts[l.status] = (counts[l.status] || 0) + 1; });
+    allNodes().forEach(l => { counts[l.status] = (counts[l.status] || 0) + 1; });
 
     root.innerHTML = snap.programs.map(p => {
-      const rows = snap.lemmas.filter(l => l.program === p.id);
+      const rows = allNodes().filter(l => l.program === p.id);
       if (!rows.length) return '';
+      rows.sort((a, b) => Number(b.running) - Number(a.running));
       const c = {};
       rows.forEach(l => { c[l.status] = (c[l.status] || 0) + 1; });
       const tally = ['checked', 'in-work', 'conjecture', 'refuted', 'dead']
         .filter(k => c[k]).map(k => `${c[k]} ${STATUS_LABEL[k]}`).join(' · ');
       return `<section class="prog-block" id="${p.id}">
         <header>
-          <h2>${p.name} · ${p.title}</h2>
+          <h2>${p.title ? p.name + ' · ' + p.title : p.name}</h2>
           <span class="aim">${p.aim}</span>
           <span class="counts">${tally}</span>
         </header>
         ${rows.map(l => `<article class="lemma-row" data-status="${l.status}"
-            data-hay="${(l.id + ' ' + l.title + ' ' + l.note + ' ' + p.name).toLowerCase()}">
+            data-hay="${(l.id + ' ' + l.title + ' ' + l.note + ' ' + (l.doing || '') + ' ' + p.name).toLowerCase()}">
           <span class="id">${l.id}</span>
           <span>${chip(l.status, STATUS_LABEL[l.status])}</span>
           <div>
             <h3>${l.title}</h3>
             <p>${l.note}</p>
-            ${l.deps.length ? `<div class="deps">rests on ${l.deps.join(' · ')}</div>` : ''}
+            ${l.doing ? `<div class="now${l.running ? ' now--live' : ''}">${l.running ? 'now' : 'last move'} · ${l.doing}</div>` : ''}
+            ${l.deps && l.deps.length ? `<div class="deps">same front as ${l.deps.join(' · ')}</div>` : ''}
           </div>
         </article>`).join('')}
       </section>`;
-    }).join('') + `<p class="board-empty" hidden>No lemma matches that.</p>`;
+    }).join('') + `<p class="board-empty" hidden>No subagent matches that.</p>`;
 
     const search = $('[data-board-search]');
     if (search) {
-      const rows = $$('.lemma-row', root);
-      const empty = $('.board-empty', root);
-      search.addEventListener('input', () => {
+      const apply = () => {
         const q = search.value.trim().toLowerCase();
+        const rows = $$('.lemma-row', root);
+        const empty = $('.board-empty', root);
         let shown = 0;
         rows.forEach(r => {
           const hit = !q || r.dataset.hay.includes(q);
@@ -151,8 +189,13 @@
         $$('.prog-block', root).forEach(block => {
           block.hidden = !$$('.lemma-row', block).some(r => !r.hidden);
         });
-        empty.hidden = shown > 0;
-      });
+        if (empty) empty.hidden = shown > 0;
+      };
+      if (!search.dataset.wired) {
+        search.dataset.wired = '1';
+        search.addEventListener('input', apply);
+      }
+      apply();
     }
   }
 
@@ -229,6 +272,8 @@
     dead: { fill: '#575C66', ring: 'rgba(87,92,102,0.45)' },
   };
   const RADIUS = { checked: 8, 'in-work': 7, conjecture: 5.5, refuted: 6, dead: 4.5 };
+  let teardown = null;
+  let mapSignature = '';
 
   function mulberry32(a) {
     return function () {
@@ -247,6 +292,33 @@
     const legendCount = $('[data-map-nodes]');
     const rand = mulberry32(20261125);
 
+    if (!snap.lemmas.length) {                     // nothing is running: say so, draw nothing
+      const paint = () => {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.34)';
+        ctx.font = '13px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(snap.vocab?.idle || 'No subagent is running this second.', rect.width / 2, rect.height / 2);
+        if (snap.idle_since) {
+          ctx.fillStyle = 'rgba(255,255,255,0.18)';
+          ctx.font = '11px Inter, system-ui, sans-serif';
+          ctx.fillText(`last move ${ago(snap.idle_since)} · the record below keeps every seat`, rect.width / 2, rect.height / 2 + 22);
+        }
+      };
+      paint();
+      const ac = new AbortController();
+      teardown = () => { ac.abort(); };
+      addEventListener('resize', paint, { signal: ac.signal });
+      if (legendCount) legendCount.textContent = '0';
+      if (card) card.hidden = true;
+      return;
+    }
+
     const nodes = snap.lemmas.map((l, i) => ({
       ...l,
       r: RADIUS[l.status] || 5,
@@ -258,7 +330,7 @@
     nodes.forEach(n => n.deps.forEach(d => { if (index[d]) links.push({ a: index[d], b: n }); }));
 
     // anchor each program in a ring; jitter seeded so the map is stable across loads
-    const r0 = 330;
+    const r0 = nodes.length > 14 ? 330 : nodes.length > 5 ? 190 : 80;
     snap.programs.forEach((p, pi) => {
       const a = (pi / snap.programs.length) * Math.PI * 2 - Math.PI / 2;
       const cx = Math.cos(a) * r0, cy = Math.sin(a) * r0 * 0.62;
@@ -458,14 +530,20 @@
       const p = PROG[n.program];
       card.hidden = false;
       card.innerHTML = `
-        <div class="mc-id">${n.id} · ${p ? p.name : ''} ${p ? p.title : ''}</div>
+        <div class="mc-id">${n.id} · ${p ? p.name + ' ' + p.title : ''}</div>
         <h3>${n.title}</h3>
         <p>${n.note}</p>
+        ${n.doing ? `<p class="mc-doing"><span>now</span> ${n.doing}</p>` : ''}
         <div class="mc-foot">
           ${chip(n.status, STATUS_LABEL[n.status])}
-          <span>${n.deps.length ? 'rests on ' + n.deps.join(', ') : 'rests on nothing'}</span>
-        </div>`;
+          <span>${n.steps ? 'step ' + n.steps + ' · ' : ''}${n.lastAt ? ago(n.lastAt) : ''}</span>
+        </div>
+        ${n.wrote ? `<div class="mc-file">writes ${n.wrote}</div>` : ''}`;
     }
+
+    const ac = new AbortController();
+    const signal = ac.signal;
+    teardown = () => { ac.abort(); mapCanvas = null; };
 
     let drag = null;
     canvas.addEventListener('pointerdown', e => {
@@ -473,7 +551,7 @@
       canvas.setPointerCapture(e.pointerId);
       drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: 0 };
       canvas.classList.add('is-dragging');
-    });
+    }, { signal });
     canvas.addEventListener('pointermove', e => {
       const rect = canvas.getBoundingClientRect();
       if (drag) {
@@ -487,7 +565,7 @@
       const n = nearest(e.clientX - rect.left, e.clientY - rect.top);
       if (n !== hovered) { hovered = n; if (!selected) showCard(n); draw(); }
       canvas.style.cursor = n ? 'pointer' : '';
-    });
+    }, { signal });
     canvas.addEventListener('pointerup', e => {
       canvas.classList.remove('is-dragging');
       if (drag && drag.moved < 5) {
@@ -498,12 +576,12 @@
         draw();
       }
       drag = null;
-    });
+    }, { signal });
     canvas.addEventListener('pointerleave', () => {
       hovered = null;
       if (!selected) showCard(null);
       draw();
-    });
+    }, { signal });
     canvas.addEventListener('wheel', e => {
       e.preventDefault();
       interacted = true;
@@ -515,28 +593,29 @@
       view.x += after.x - before.x;
       view.y += after.y - before.y;
       draw();
-    }, { passive: false });
+    }, { passive: false, signal });
     canvas.addEventListener('dblclick', () => {
       interacted = false; fit();
       selected = null; showCard(null); draw();
-    });
+    }, { signal });
 
     const search = $('[data-map-search]');
     if (search) {
       search.addEventListener('input', () => {
         query = search.value.trim().toLowerCase();
         draw();
-      });
+      }, { signal });
     }
 
     for (let i = 0; i < 320; i++) tick(1);
     nodes.forEach(n => { n.vx = 0; n.vy = 0; });
     size();
-    addEventListener('resize', size);
+    addEventListener('resize', size, { signal });
 
     if (!reduced) {
       let last = 0;
       const loop = t => {
+        if (ac.signal.aborted) return;
         if (t - last > 45) { last = t; draw(); }
         requestAnimationFrame(loop);
       };
@@ -546,16 +625,70 @@
     if (legendCount) legendCount.textContent = nodes.length;
   }
 
-  renderCounters();
-  renderStatus();
-  renderPrograms();
-  renderPapers();
-  renderGraveyard();
-  renderBoard();
-  renderFeed();
-  wireFilters();
-  setupMap();
+  /* ---------- mount, live polling ---------- */
 
-  // the year in the footer
-  $$('[data-year]').forEach(n => { n.textContent = new Date().getFullYear(); });
+  function mountMap() {
+    if (!$('#fleet-map')) return;
+    const sig = snap.lemmas.map(l => l.id + ':' + l.status).join('|');
+    if (teardown && sig === mapSignature) return;   // same fleet: keep the map and its zoom
+    if (teardown) teardown();
+    mapSignature = sig;
+    setupMap();
+  }
+
+  function applySnapshot(next) {
+    snap = next;
+    PROG = Object.fromEntries(snap.programs.map(p => [p.id, p]));
+    renderVocab();
+    renderCounters();
+    renderStatus();
+    renderPrograms();
+    renderPapers();
+    renderGraveyard();
+    renderBoard();
+    renderFeed();
+    renderActivity();
+    mountMap();
+    $$('[data-year]').forEach(n => { n.textContent = new Date().getFullYear(); });
+  }
+
+  function liveChip(state) {
+    $$('[data-live]').forEach(node => {
+      const v = snap.vocab || {};
+      if (state === 'live') {
+        node.innerHTML = `<i class="dot pulse"></i> ${v.live || 'live'} · ${ago(snap.generated_at)}`;
+        node.className = 'chip chip--checked';
+      } else if (state === 'stale') {
+        node.innerHTML = `<i class="dot dot--paused"></i> ${v.snapshot || 'snapshot'} · ${ago(snap.generated_at)}`;
+        node.className = 'chip';
+      }
+    });
+  }
+
+  let failures = 0;
+  async function pullLive() {
+    try {
+      const res = await fetch(`live.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(String(res.status));
+      const next = await res.json();
+      failures = 0;
+      if (next.generated_at === snap.generated_at) {
+        renderActivity();
+        liveChip('live');
+        return;
+      }
+      applySnapshot(next);
+      liveChip('live');
+    } catch {
+      failures++;
+      if (failures > 1) liveChip('stale');
+    }
+  }
+
+  applySnapshot(snap);
+  liveChip('stale');
+  if (location.protocol.startsWith('http')) {
+    pullLive();
+    setInterval(pullLive, 5000);
+  }
 })();

@@ -519,6 +519,36 @@ code, pre { font-family: var(--mono); font-size: 13px; }
 }
 .code .c { color: #7B7E86; }
 
+/* ---------- what the fleet is doing ---------- */
+
+.activity { border-top: 1px solid var(--ink); margin-top: 6px; }
+.act {
+  display: grid; grid-template-columns: 132px 46px minmax(0, 1fr) auto; gap: 14px;
+  padding: 12px 0; border-bottom: 1px solid var(--rule-soft); align-items: baseline;
+}
+.act-id { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+.act-front { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--gold); }
+.act-doing {
+  font-family: var(--mono); font-size: 12.5px; color: var(--ink-2);
+  overflow-wrap: anywhere; line-height: 1.45;
+}
+.act-meta { font-family: var(--mono); font-size: 11px; color: var(--ink-meta); text-align: right; white-space: nowrap; }
+.act--past .act-id { color: var(--ink-3); }
+.act--past .act-doing { color: var(--ink-3); }
+.act-empty { padding: 14px 0; border-bottom: 1px solid var(--rule-soft); color: var(--ink-meta); font-size: 13.5px; }
+
+.now { margin-top: 6px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); overflow-wrap: anywhere; }
+.now--live { color: var(--work); }
+
+.mc-doing {
+  margin-top: 8px; font-family: var(--mono); font-size: 11.5px; color: #BFE8FF; overflow-wrap: anywhere;
+}
+.mc-doing span {
+  font-family: var(--sans); font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--gold); margin-right: 6px;
+}
+.mc-file { margin-top: 6px; font-family: var(--mono); font-size: 10px; color: var(--night-meta); overflow-wrap: anywhere; }
+
 /* ---------- footer ---------- */
 
 .site-footer { margin-top: var(--section); background: #14120F; color: #A9A396; }
@@ -555,6 +585,8 @@ code, pre { font-family: var(--mono); font-size: 13px; }
   .site-nav { order: 3; width: 100%; margin-left: 0; gap: 8px 16px; flex-wrap: wrap; }
   .site-nav a { font-size: 13px; }
   .nav-join { margin-left: auto; }
+  .act { grid-template-columns: 1fr; gap: 4px; }
+  .act-meta { text-align: left; }
   .prog-grid { grid-template-columns: 1fr; }
   .legend-list { grid-template-columns: 1fr; }
   .feed li { grid-template-columns: 1fr; gap: 6px; }
