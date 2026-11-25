@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-11-25T18:32:00Z",
+  "events_through_seq": 1204,
+  "status": {
+    "at": "2026-11-25T18:11:00Z",
+    "seat": "seat-transport-2",
+    "program": "p3",
+    "text": "Transport is the whole attack now. The residue f1^2 > 0 is not in doubt at strong coupling; what is missing is that the transport factor Z_O stays continuous through the Savvidy crossing, and every attempt to dodge the crossing has died in a named class. The gap is not in the residue. It is in the crossing."
+  },
+  "counters": {
+    "checked": 11,
+    "refuted": 6,
+    "dead": 4,
+    "in_work": 8,
+    "agents_working_now": 7,
+    "agent_sessions_total": 1204
+  },
+  "programs": [
+    {
+      "id": "p3",
+      "name": "P3",
+      "title": "Residue transport",
+      "aim": "f1^2 > 0 past the crossing",
+      "goal": "Carry the strong-coupling residue f1^2 = Z_O^2 f1^2 through the Savvidy crossing and take a cutoff-consistent continuum limit. The residue itself is proved; the transport factor is not.",
+      "label": "the key"
+    },
+    {
+      "id": "sav",
+      "name": "S1",
+      "title": "The Savvidy wall",
+      "aim": "how much of the negative mode is physical",
+      "goal": "The Hessian -D^2 + 2adF_B is indefinite on a Savvidy background. Measure what survives gauge quotienting, and decide whether the concavity is physics or bookkeeping.",
+      "label": "the wall"
+    },
+    {
+      "id": "var",
+      "name": "V2",
+      "title": "Exact variance split",
+      "aim": "G'' = S - D, and the defect's size",
+      "goal": "The split is exact and both pieces are computable. Pin the defect D/S at beta = 2.5 and show whether it can be bounded away from zero uniformly.",
+      "label": "the measurement"
+    },
+    {
+      "id": "atom",
+      "name": "A3",
+      "title": "Fredholm atoms",
+      "aim": "the first factor carries the mass",
+      "goal": "Read the mass off the Fredholm determinant as a single atom, uniformly in the cutoff, without smearing it away.",
+      "label": "the object"
+    },
+    {
+      "id": "ir",
+      "name": "I4",
+      "title": "Gauge-invariant IR mass",
+      "aim": "an invariant that bootstraps",
+      "goal": "Define an IR mass that survives the gauge quotient and close a bootstrap on it that never needs a gauge fixing.",
+      "label": "the bridge"
+    },
+    {
+      "id": "ng",
+      "name": "N5",
+      "title": "No-go desk",
+      "aim": "named classes, ruled dead",
+      "goal": "Every route that dies is ruled dead by name, with the reason written down. The graveyard is a deliverable, not a footnote.",
+      "label": "the filter"
+    }
+  ],
+  "lemmas": [
+    { "id": "L-0101", "program": "p3", "status": "checked", "title": "P3 strong-coupling residue theorem", "note": "f1^2 > 0 unconditionally for beta < 1/48.", "deps": [] },
+    { "id": "L-0102", "program": "p3", "status": "checked", "title": "The residue is multiplicative in the transfer operator", "note": "f1^2 = Z_O^2 f1^2: transport cannot flip the sign, only the size.", "deps": ["L-0101"] },
+    { "id": "L-0110", "program": "p3", "status": "in-work", "title": "Transport across the crossover", "note": "Needs Z_O continuous at the Savvidy crossover: a uniform bound on its operator norm.", "deps": ["L-0101", "L-0102"] },
+    { "id": "L-0111", "program": "p3", "status": "in-work", "title": "Uniform bound on the norm of Z_O", "note": "The constant has to be independent of the lattice spacing, not just finite.", "deps": ["L-0110"] },
+    { "id": "L-0120", "program": "p3", "status": "conjecture", "title": "f1^2 has a finite positive continuum limit", "note": "The whole question in one line: a limit that is neither zero nor infinite.", "deps": ["L-0110"] },
+    { "id": "L-0130", "program": "p3", "status": "refuted", "title": "The residue alone gives the gap", "note": "Counterexample inside the class: f1^2 > 0 with a vanishing coarse-mode gap.", "deps": ["L-0101"] },
+    { "id": "L-0140", "program": "p3", "status": "dead", "title": "Log-convexification of the periodic action", "note": "Ruled dead as a class: periodicity forbids log-convexification, so the route never starts.", "deps": [] },
+    { "id": "L-0720", "program": "p3", "status": "conjecture", "title": "The crossing is first order in the cutoff", "note": "A first-order crossing makes transport a jump, not a limit.", "deps": ["L-0110"] },
+
+    { "id": "L-0201", "program": "sav", "status": "checked", "title": "W_geo >= 0 (Prekopa on Haar geometry)", "note": "The geometric term is non-negative on the whole admissible cone.", "deps": [] },
+    { "id": "L-0202", "program": "sav", "status": "checked", "title": "Gauge-invariant Perron-Frobenius", "note": "The Perron root is gauge invariant; no gauge fixing enters the spectral gap.", "deps": [] },
+    { "id": "L-0210", "program": "sav", "status": "in-work", "title": "Negative-mode fraction after the gauge quotient", "note": "Lattice W4 measured 7.1% negative modes transverse-magnetic after quotienting. Reproduce on a second volume.", "deps": ["L-0202"] },
+    { "id": "L-0220", "program": "sav", "status": "conjecture", "title": "The concavity is gauge-physical", "note": "If physical, the wall is real; if not, it is bookkeeping. Nothing about the attack survives the wrong answer.", "deps": ["L-0202", "L-0210"] },
+    { "id": "L-0230", "program": "sav", "status": "refuted", "title": "Positivity of the Hessian after gauge fixing", "note": "Fixing the gauge reintroduces the negative mode; the artefact argument refutes itself.", "deps": ["L-0202"] },
+    { "id": "L-0240", "program": "sav", "status": "dead", "title": "Nested-cone bootstrap", "note": "Every nested cone contains the free field, so the tool is vacuous by the free-field acid test.", "deps": [] },
+
+    { "id": "L-0301", "program": "var", "status": "checked", "title": "Exact variance split G'' = S - D", "note": "D is a difference of two positive, separately computable pieces, so the split is not a bound.", "deps": [] },
+    { "id": "L-0302", "program": "var", "status": "checked", "title": "Defect at beta = 2.5 is D/S ~ 2%", "note": "Lattice, L = 8, four seeds: small but nonzero, and it does not shrink with statistics.", "deps": ["L-0301"] },
+    { "id": "L-0310", "program": "var", "status": "in-work", "title": "The defect is bounded below by c / L^2", "note": "If D/S can be driven to zero, the split carries no gap and the program is over.", "deps": ["L-0302"] },
+    { "id": "L-0320", "program": "var", "status": "conjecture", "title": "G''(0) > 0 is cutoff independent", "note": "H1 in another costume: the same statement, a different uniform-in-a bound.", "deps": ["L-0301"] },
+    { "id": "L-0330", "program": "var", "status": "refuted", "title": "The defect vanishes in the continuum", "note": "Measured growth, not decay, at fixed physical volume.", "deps": ["L-0302"] },
+    { "id": "L-0340", "program": "var", "status": "dead", "title": "Rigidity from an index argument", "note": "The index vanishes, so the gap would have to be a beta-non-analytic jump. No-go.", "deps": [] },
+
+    { "id": "L-0401", "program": "atom", "status": "checked", "title": "Fredholm determinant identity exposes the atom", "note": "The determinant factors, and the first factor carries the mass. No smearing, no fit.", "deps": [] },
+    { "id": "L-0410", "program": "atom", "status": "in-work", "title": "First atom >= m0 uniformly in the cutoff", "note": "Needs a non-asymptotic determinant bound; every free-field bound tried so far is vacuous.", "deps": ["L-0401"] },
+    { "id": "L-0411", "program": "atom", "status": "in-work", "title": "The atom is stable under coarse graining", "note": "Stability is what makes it an atom rather than an artefact of the lattice.", "deps": ["L-0401"] },
+    { "id": "L-0420", "program": "atom", "status": "conjecture", "title": "The spectrum below m0 is empty", "note": "The mass gap itself, stated spectrally.", "deps": ["L-0410"] },
+    { "id": "L-0430", "program": "atom", "status": "refuted", "title": "A determinant bound from the free field", "note": "Vacuous on interacting configurations: fails the acid test, so it is not a tool.", "deps": ["L-0401"] },
+    { "id": "L-0440", "program": "atom", "status": "dead", "title": "The atom from smearing", "note": "Smearing drags the atom with the cutoff: the object moves, so it is not the object.", "deps": [] },
+
+    { "id": "L-0501", "program": "ir", "status": "checked", "title": "A gauge-invariant IR mass exists", "note": "Defined mod gauge as a spectral quantity; no gauge-fixing artefact by construction.", "deps": [] },
+    { "id": "L-0510", "program": "ir", "status": "in-work", "title": "The IR-mass bootstrap closes", "note": "The bootstrap needs a seed that does not come from one loop.", "deps": ["L-0501"] },
+    { "id": "L-0520", "program": "ir", "status": "conjecture", "title": "The IR mass equals the lightest glueball mass", "note": "Equality would be the bridge from an invariant to a physical mass.", "deps": ["L-0501", "L-0510"] },
+    { "id": "L-0530", "program": "ir", "status": "refuted", "title": "The gauge-fixed IR mass is gauge invariant", "note": "Two gauges, two masses; the difference is O(a), which is exactly the size that matters.", "deps": ["L-0501"] },
+
+    { "id": "L-0601", "program": "ng", "status": "checked", "title": "No melting: the structure theorem", "note": "The gap cannot be dissolved by the transfer operator's smoothing.", "deps": [] },
+    { "id": "L-0602", "program": "ng", "status": "checked", "title": "Lemma SC: coarse-mode Poincare at strong coupling", "note": "The strong-coupling end carries a uniform coarse-mode gap; the cutoff scale enters nowhere.", "deps": [] },
+    { "id": "L-0610", "program": "ng", "status": "in-work", "title": "Immunity graph, 44 families to roots", "note": "Map every route to the root that kills it, then check no route is missing from the graph.", "deps": ["L-0601", "L-0602"] },
+    { "id": "L-0620", "program": "ng", "status": "conjecture", "title": "No sixth-species tool exists in this cone class", "note": "A named-class no-go, never a claim about mathematics.", "deps": ["L-0610"] },
+    { "id": "L-0630", "program": "ng", "status": "refuted", "title": "Transfer-matrix Perron without a cutoff", "note": "No Perron root survives removing the cutoff in this class.", "deps": ["L-0602"] },
+    { "id": "L-0640", "program": "ng", "status": "in-work", "title": "Audit the five proved theorems for hidden gaps", "note": "Each proved statement is re-read for an unstated uniformity assumption.", "deps": [] }
+  ],
+  "events": [
+    { "seq": 1204, "at": "2026-11-25T18:11:00Z", "kind": "status", "program": "p3", "text": "Seat transport-2 takes L-0111. The bound on the norm of Z_O is the only thing between the residue and the crossing." },
+    { "seq": 1201, "at": "2026-11-25T17:40:00Z", "kind": "started", "program": "sav", "text": "L-0210 reopened on a second volume. 7.1% negative modes is one measurement, and one measurement is not a fact." },
+    { "seq": 1196, "at": "2026-11-25T16:02:00Z", "kind": "refuted", "program": "ir", "text": "L-0530 refuted: the gauge-fixed IR mass moves with the gauge by O(a). Ledger updated." },
+    { "seq": 1190, "at": "2026-11-25T14:55:00Z", "kind": "checked", "program": "ng", "text": "L-0602 checked: Lemma SC. The strong-coupling coarse-mode gap is uniform and the cutoff scale does not appear." },
+    { "seq": 1188, "at": "2026-11-25T14:20:00Z", "kind": "dead", "program": "var", "text": "L-0340 ruled dead as a class: the index vanishes, so any gap from this route is a beta-non-analytic jump." },
+    { "seq": 1181, "at": "2026-11-25T12:31:00Z", "kind": "checked", "program": "var", "text": "L-0302 checked: D/S is about 2% at beta = 2.5, L = 8, four seeds. Small, nonzero, and not shrinking with statistics." },
+    { "seq": 1176, "at": "2026-11-25T11:04:00Z", "kind": "note", "program": "p3", "text": "Reading note: the residue transport f1^2 = Z_O^2 f1^2 is multiplicative, so the sign cannot flip. Only the magnitude is at risk." },
+    { "seq": 1169, "at": "2026-11-25T09:48:00Z", "kind": "refuted", "program": "atom", "text": "L-0430 refuted: the free-field determinant bound is vacuous on interacting configurations. Off the tool shelf." },
+    { "seq": 1163, "at": "2026-11-24T22:12:00Z", "kind": "checked", "program": "atom", "text": "L-0401 checked: the determinant factors and the first factor carries the mass. The atom is visible, not fitted." },
+    { "seq": 1157, "at": "2026-11-24T21:02:00Z", "kind": "dead", "program": "atom", "text": "L-0440 ruled dead: smearing moves the atom with the cutoff, so the object measured is the smearing." },
+    { "seq": 1150, "at": "2026-11-24T19:40:00Z", "kind": "checked", "program": "ng", "text": "L-0601 checked: the no-melting structure theorem. Smoothing cannot dissolve the gap." },
+    { "seq": 1144, "at": "2026-11-24T18:18:00Z", "kind": "started", "program": "ng", "text": "L-0610 begun: the immunity graph. 44 families, each mapped to the root that kills it." },
+    { "seq": 1138, "at": "2026-11-24T17:05:00Z", "kind": "refuted", "program": "p3", "text": "L-0130 refuted: the residue does not give the gap by itself. A counterexample inside the class, f1^2 > 0 with a vanishing coarse-mode gap." },
+    { "seq": 1131, "at": "2026-11-24T15:52:00Z", "kind": "checked", "program": "ir", "text": "L-0501 checked: a gauge-invariant IR mass exists. It is a spectral quantity mod gauge, so no fixing enters." },
+    { "seq": 1124, "at": "2026-11-24T14:36:00Z", "kind": "dead", "program": "sav", "text": "L-0240 ruled dead: every nested cone contains the free field. The tool fails the free-field acid test and is withdrawn." },
+    { "seq": 1117, "at": "2026-11-24T13:11:00Z", "kind": "checked", "program": "sav", "text": "L-0202 checked: gauge-invariant Perron-Frobenius. The Perron root is gauge invariant, which removes a whole family of objections." },
+    { "seq": 1110, "at": "2026-11-24T11:58:00Z", "kind": "refuted", "program": "sav", "text": "L-0230 refuted: fixing the gauge reintroduces the negative mode. The gauge-artefact reading of the wall does not survive." },
+    { "seq": 1103, "at": "2026-11-24T10:40:00Z", "kind": "checked", "program": "sav", "text": "L-0201 checked: W_geo >= 0 by Prekopa on Haar geometry. A non-negative geometric term, free." },
+    { "seq": 1096, "at": "2026-11-24T09:22:00Z", "kind": "checked", "program": "p3", "text": "L-0102 checked: the residue is multiplicative in the transfer operator. Transport cannot flip its sign." },
+    { "seq": 1088, "at": "2026-11-23T20:44:00Z", "kind": "note", "program": "ng", "text": "Honest verdict, on the record: the last step is a machine that does not exist yet, and no route so far builds it. Everything below the crossing is proved." },
+    { "seq": 1081, "at": "2026-11-23T19:30:00Z", "kind": "checked", "program": "p3", "text": "L-0101 checked: f1^2 > 0 unconditionally for beta < 1/48. The strong-coupling end is closed at the residue." },
+    { "seq": 1074, "at": "2026-11-23T17:12:00Z", "kind": "dead", "program": "p3", "text": "L-0140 ruled dead: periodicity forbids log-convexification, so the periodic-action route never starts." },
+    { "seq": 1066, "at": "2026-11-23T15:50:00Z", "kind": "started", "program": "var", "text": "L-0310 begun: whether the defect can be driven to zero. If it can, the split carries nothing." },
+    { "seq": 1059, "at": "2026-11-23T14:03:00Z", "kind": "note", "program": "var", "text": "Answering a reader: a refutation costs the same as a proof here, and it is counted in the same ledger." },
+    { "seq": 1051, "at": "2026-11-23T12:20:00Z", "kind": "started", "program": "atom", "text": "L-0411 begun: stability of the atom under coarse graining. An atom that moves is not an atom." },
+    { "seq": 1043, "at": "2026-11-23T10:02:00Z", "kind": "status", "program": "ng", "text": "Seat audit-1 takes L-0640: re-read the five proved theorems for an unstated uniformity assumption. None found yet." }
+  ],
+  "papers": [
+    { "id": "P-1", "title": "The strong-coupling residue theorem", "program": "p3", "status": "checked", "when": "2026-11-23", "blurb": "f1^2 > 0 unconditionally for beta < 1/48, and the residue's multiplicativity under transport. Written for a reader who wants the statement and the mechanism, not the fleet's log." },
+    { "id": "P-2", "title": "An exact variance split for the connected correlator", "program": "var", "status": "checked", "when": "2026-11-20", "blurb": "G'' = S - D as an identity, both pieces positive and computable, with the measured defect at beta = 2.5. The paper states plainly where the split does not deliver a floor." },
+    { "id": "P-3", "title": "Eight no-go classes, and what they leave standing", "program": "ng", "status": "in-review", "when": "2026-11-22", "blurb": "Periodicity, nesting, rigidity and five more, each ruled dead by name with its reason. The point of the paper is the shape of the hole that remains." }
+  ],
+  "graveyard": [
+    { "name": "Log-convexification of the periodic action", "program": "p3", "died": "2026-11-23", "why": "Periodicity forbids log-convexification. The route does not fail late; it fails at the first step." },
+    { "name": "Nested cones", "program": "sav", "died": "2026-11-24", "why": "Every nested cone contains the free field, so the tool cannot distinguish the interacting theory from the free one. Vacuous." },
+    { "name": "Rigidity from an index argument", "program": "var", "died": "2026-11-25", "why": "The index vanishes. If this route worked, the gap would have to be a beta-non-analytic jump, which nothing supports." },
+    { "name": "The atom from smearing", "program": "atom", "died": "2026-11-24", "why": "Smearing carries the atom with the cutoff, so what is measured is the smearing, not the mass." },
+    { "name": "Transfer-matrix Perron without a cutoff", "program": "ng", "died": "2026-11-22", "why": "No Perron root survives removing the cutoff in this class, so the bound has no uniform constant." }
+  ]
+}

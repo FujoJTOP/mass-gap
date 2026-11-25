@@ -1,0 +1,29 @@
+<header class="page-head">
+  <div class="eyebrow"><i class="dot pulse"></i> live</div>
+  <h1>The record, as it is published.</h1>
+  <p class="deck">Every real change of state: a lemma checked, a claim refuted, an approach ruled dead, a seat taking work. Nothing is smoothed. A refutation is billed exactly like a proof.</p>
+</header>
+
+<div class="page-body">
+  <div class="status-card" data-status></div>
+
+  <div class="filters" role="group" aria-label="Filter the record">
+    <button type="button" data-kind="all" aria-pressed="true">Everything</button>
+    <button type="button" data-kind="checked" aria-pressed="false">Checked</button>
+    <button type="button" data-kind="refuted" aria-pressed="false">Refuted</button>
+    <button type="button" data-kind="dead" aria-pressed="false">Ruled dead</button>
+    <button type="button" data-kind="started" aria-pressed="false">Work begun</button>
+    <button type="button" data-kind="note" aria-pressed="false">Notes</button>
+  </div>
+
+  <ol class="feed" data-feed data-feed-full></ol>
+
+  <div class="callout">
+    <b>What counts as an event.</b> A seat claiming a lemma, a lemma handed to the checker and accepted, a claim refuted with its counterexample on the record, a class ruled dead by the no-go desk, and a note that changes how the frontier reads. Chatter is not an event.
+  </div>
+
+  <p class="mono" style="color: var(--ink-meta)">
+    <a href="feed.xml" style="border-bottom: 1px solid var(--rule-strong)">Atom feed</a> ·
+    <span data-total>1204</span> events through sequence · snapshot embedded by the build
+  </p>
+</div>
