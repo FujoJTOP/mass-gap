@@ -40,8 +40,8 @@
   --night-meta: #8E8B84;
   --night-rule: rgba(255, 255, 255, 0.10);
 
-  --serif: 'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
-  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Newsreader', 'Noto Serif SC', 'Songti SC', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
 
   --page: 1240px;
@@ -135,6 +135,13 @@ button { font: inherit; color: inherit; }
   padding: 7px 14px; white-space: nowrap;
   transition: border-color 120ms ease, background 120ms ease;
 }
+.lang-switch {
+  flex: none; font-size: 12px; letter-spacing: 0.05em; color: var(--ink-3);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 5px 10px;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.lang-switch:hover { color: var(--ink); border-color: var(--rule-strong); background: var(--paper-warm); }
+
 .nav-join:hover { border-color: var(--ink-3); background: var(--paper-warm); }
 
 /* ---------- shared bits ---------- */
@@ -220,6 +227,8 @@ button { font: inherit; color: inherit; }
   letter-spacing: -0.028em;
 }
 .hero h1 em { font-style: italic; color: var(--ink-2); }
+html[lang='zh-CN'] .hero h1 em { font-style: normal; color: var(--ink-2); }
+html[lang='zh-CN'] .hero h1 { letter-spacing: -0.01em; line-height: 1.12; }
 
 .hero-deck {
   margin-top: 22px; max-width: 62ch;

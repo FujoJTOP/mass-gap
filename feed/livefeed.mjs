@@ -40,6 +40,8 @@ const strip = s => String(s ?? '')
   .replace(/<\|im_start\|>[\s\S]*/g, '')      // leaked control tokens: drop the tail
   .replace(/```[\s\S]*?```/g, ' ')
   .replace(/\*\*|`|^#+\s*/gm, '')             // markdown emphasis noise
+  .replace(/[|]/g, ' ')                       // table pipes read as noise in a one-line card
+  .replace(/-{2,}|={2,}/g, ' ')               // table rules too
   .replace(/\s+/g, ' ')
   .trim();
 
@@ -374,7 +376,9 @@ function buildSnapshot() {
     },
     status: {
       at: isoFull(lastAssistant?.time ?? now),
-      seat: `main · turn ${turns} · ${nodes.length} subagents`,
+      seat: `turn ${turns} · ${nodes.length} subagents`,
+      turn: turns,
+      subagents: nodes.length,
       program: null,
       text: statusPick.length > 320 ? statusPick.slice(0, 318) + ' …' : statusPick,
     },
@@ -389,19 +393,32 @@ function buildSnapshot() {
       in_work: running.length,
     },
     vocab: {
-      sessions: 'subagents spawned so far, live',
-      working: 'running right now',
-      checked: 'subagents with a [T] verdict',
-      refuted: 'refutations on the record',
-      dead: 'no-go rulings [NG]',
-      node: 'subagents',
-      nodes: 'subagents',
-      map_count: 'running',
-      map_work: 'spawned',
-      live: 'live · reading the session log every 6s',
-      snapshot: 'session log · local snapshot',
-      board_title: 'Every subagent, by front and verdict',
-      idle: 'no subagent is running this second',
+      zh: {
+        sessions: '累计派出的子代理，实时',
+        working: '此刻在跑',
+        checked: '结案判 [T] 的子代理',
+        refuted: '记录里的否证',
+        dead: '判死 [NG]',
+        map_count: '在跑',
+        map_work: '累计派出',
+        live: '实时 · 每 6 秒读一次会话日志',
+        snapshot: '会话日志 · 本地快照',
+        board_title: '每个子代理，按战线与结案判定',
+        idle: '此刻没有子代理在跑',
+      },
+      en: {
+        sessions: 'subagents spawned so far, live',
+        working: 'running right now',
+        checked: 'subagents with a [T] verdict',
+        refuted: 'refutations on the record',
+        dead: 'no-go rulings [NG]',
+        map_count: 'running',
+        map_work: 'spawned',
+        live: 'live · reading the session log every 6s',
+        snapshot: 'session log · local snapshot',
+        board_title: 'Every subagent, by front and verdict',
+        idle: 'no subagent is running this second',
+      },
     },
     running: running.slice(0, 12).map(n => ({
       id: n.id,

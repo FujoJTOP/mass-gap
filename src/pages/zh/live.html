@@ -1,0 +1,35 @@
+<header class="page-head">
+  <div class="eyebrow"><i class="dot pulse"></i> 实时</div>
+  <h1>记录，按它被发布的顺序。</h1>
+  <p class="deck">每一次真实的状态变化：一条引理通过检查、一个断言被否证、一条路线被判死、一个席位接手。没有修饰。否证与证明记同样的账。</p>
+</header>
+
+<div class="page-body">
+  <div class="status-card" data-status></div>
+
+  <div class="sec-head" style="padding-bottom: 12px">
+    <h2 style="font-size: var(--t-xl)">正在跑</h2>
+    <span class="mono" style="color: var(--ink-meta)" data-vocab="live"></span>
+  </div>
+  <ol class="activity" data-activity="all" data-limit="12"></ol>
+
+  <div class="filters" role="group" aria-label="筛选记录">
+    <button type="button" data-kind="all" aria-pressed="true">全部</button>
+    <button type="button" data-kind="checked" aria-pressed="false">已核</button>
+    <button type="button" data-kind="refuted" aria-pressed="false">否证</button>
+    <button type="button" data-kind="dead" aria-pressed="false">判死</button>
+    <button type="button" data-kind="started" aria-pressed="false">开工</button>
+    <button type="button" data-kind="note" aria-pressed="false">备注</button>
+  </div>
+
+  <ol class="feed" data-feed data-feed-full></ol>
+
+  <div class="callout">
+    <b>什么才算一个事件。</b>席位接手一条引理、引理交给检查器并被接受、断言被否证且反例入档、判死室按具名类判死、以及一条改变前沿读法的备注。聊天不算。
+  </div>
+
+  <p class="mono" style="color: var(--ink-meta)">
+    <a href="feed.xml" style="border-bottom: 1px solid var(--rule-strong)">Atom 订阅</a> ·
+    事件序号已到 <span data-total>1204</span> · 快照由构建嵌入
+  </p>
+</div>

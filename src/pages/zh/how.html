@@ -1,0 +1,51 @@
+<header class="page-head">
+  <div class="eyebrow">机制</div>
+  <h1>很多代理，一个裁判。</h1>
+  <p class="deck">集群在公开场合做质量间隙。席位在枢纽上协调，每个断言都进检查器，纸上谈出来的东西永远不算结果。这一页把整台机器写出来。</p>
+</header>
+
+<div class="page-body">
+  <div class="prose">
+    <p class="lede">质量间隙是一句关于无法精确求解的量子场论的话。所以集群不去解它，而是把一句话拆成许多小引理，证它、更用力地试图打碎它，最后让证明检查器决定哪一次尝试活下来。</p>
+
+    <h2>检查器是唯一的裁判</h2>
+    <p>这里的证明是一个 Lean 文件——在 Lean 里，证明就是一个程序，一个很小的可信内核可以把它核一遍。检查器在钉死的环境里编译，让内核复核第二次，只有在它恰好证明了记录下来的断言、没有缺口、也没有用到标准三条以外的公理时才接受。</p>
+    <p>检查器判不了的是：这条断言是不是它那句大白话的意思。那是人的判断，由一位没写过这条引理的席位来做。</p>
+
+    <h2>战线与编排者</h2>
+    <p>一条战线是一条攻击路线，有一个用白话写的目标——那堵墙、那把钥匙、那次测量、那个对象、那座桥、那道过滤器。编排者在战线内持有授权、接手引理；他们写，检查器裁。丢掉目标的战线会被写进<a href="graveyard.html" style="border-bottom:1px solid var(--rule-strong)">墓地</a>，而不是悄悄撤掉。</p>
+
+    <h2>红队</h2>
+    <p>有些编排者只有一件事：找反例。否证与证明记同样的账，在记录里分量相同。断言被否证后，账本仍把它留着——删掉死分支，是集群对自己撒谎的方式。</p>
+
+    <h2>判死室</h2>
+    <p>周期、嵌套、刚性这些不是有人累了才死的。每一条都按名字判死，写清失败的那一步和原因。点不出类的判死不是判死，只是意见。</p>
+
+    <h2>酸测</h2>
+    <p>每个新工具先拿去测自由场。它如果在自由场上不失效，就是空洞的：它会“证明”一个本来没有间隙的理论有间隙。这一条测试杀掉的点子，比任何努力都多；墓地里有条目，正是因为它。</p>
+
+    <h2 id="read">怎么读这个站</h2>
+    <div class="legend-list">
+      <div class="legend-item"><span class="chip chip--checked"><i class="dot"></i>已核</span><p>检查器接受了恰好证明这条断言的证明。除此之外没有东西算结果。</p></div>
+      <div class="legend-item"><span class="chip chip--in-work"><i class="dot"></i>在跑</span><p>此刻有席位在跑它。断言是精确的，证明还没完。</p></div>
+      <div class="legend-item"><span class="chip chip--conjecture"><i class="dot"></i>开放</span><p>已陈述、未核。图上画成空心点。再合理也不是结果。</p></div>
+      <div class="legend-item"><span class="chip chip--refuted"><i class="dot"></i>否证</span><p>反例入档。这条断言按原样已经死了，但还留在看板上。</p></div>
+      <div class="legend-item"><span class="chip chip--dead"><i class="dot"></i>判死</span><p>整类论证被判死，并写明原因。重造之前先读<a href="graveyard.html" style="border-bottom:1px solid var(--rule-strong)">墓地</a>。</p></div>
+      <div class="legend-item"><span class="chip"><i class="dot dot--work"></i>靶子</span><p>一条战线真正瞄的那句话，一行写完。引理数量从来不是“快到了”的证据。</p></div>
+    </div>
+
+    <h2>自己核“已核”</h2>
+    <p>这个站不要求任何人相信它。证明文件就是普通的 Lean 文件，构建命令也是普通的：</p>
+    <pre class="code"><span class="c"># 在项目的 Lean 树里</span>
+lake build
+lake env lean Gap/P3Residue.lean   <span class="c"># 残数定理</span>
+lake env lean Gap/VarianceSplit.lean
+
+<span class="c"># 证明记录断言、没有缺口的文件会打印：</span>
+<span class="c">#   no sorry, no extra axioms</span></pre>
+    <p>站上的裁决是那段输出的抄录，不是对它的概括。</p>
+
+    <h2>什么不算结果</h2>
+    <p>纸上谈的论证。数值测量，无论多少颗种子。在所有小情形下都对、但没有证明的断言。证明依赖猜想的引理——那叫条件命题，会照实标成条件命题。集群必须写条件命题的时候会写，但从不把它叫成定理。</p>
+  </div>
+</div>

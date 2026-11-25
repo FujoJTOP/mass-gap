@@ -5,6 +5,44 @@
   if (!tag) return;
   let snap = JSON.parse(tag.textContent);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LANG = (document.documentElement.lang || 'en').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  const T = {
+    zh: {
+      labels: { checked: '已核', refuted: '否证', 'in-work': '在跑', conjecture: '开放', dead: '判死' },
+      kinds: { checked: '已核', refuted: '否证', dead: '判死', 'in-work': '在跑', started: '开工', status: '状态', note: '备注', conjecture: '开放' },
+      ago: s => s < 90 ? `${Math.max(1, Math.round(s))} 秒前` : s < 5400 ? `${Math.round(s / 60)} 分钟前` : s < 172800 ? `${Math.round(s / 3600)} 小时前` : `${Math.round(s / 86400)} 天前`,
+      seats: n => `${n} 个席位在跑`,
+      asOf: iso => `截至 ${iso} UTC`,
+      now: '此刻', last: '最后动作', step: '第', stepEnd: ' 步', calls: ' 次调用',
+      sameFront: ids => `同一战线：${ids}`,
+      checkedBy: '检查器已核', inReview: '人工审阅中',
+      tally: { checked: '已核', refuted: '否证', 'in-work': '在跑', conjecture: '开放', dead: '判死' },
+      boardEmpty: '没有匹配的子代理。',
+      seeLemmas: '看引理',
+      progCount: (n, k) => `${n} ${k}`,
+      writes: w => `写入 ${w}`,
+      emptyMap2: '下面这条记录保留每个席位',
+      idle: '此刻没有子代理在跑。',
+    },
+    en: {
+      labels: { checked: 'checked', refuted: 'refuted', 'in-work': 'in work', conjecture: 'open', dead: 'dead' },
+      kinds: { checked: 'checked', refuted: 'refuted', dead: 'dead', 'in-work': 'in work', started: 'started', status: 'status', note: 'note', conjecture: 'open' },
+      ago: s => s < 90 ? `${Math.max(1, Math.round(s))}s ago` : s < 5400 ? `${Math.round(s / 60)}m ago` : s < 172800 ? `${Math.round(s / 3600)}h ago` : `${Math.round(s / 86400)}d ago`,
+      seats: n => `${n} seats working now`,
+      asOf: iso => `as of ${iso} UTC`,
+      now: 'now', last: 'last move', step: 'step ', stepEnd: '', calls: ' calls',
+      sameFront: ids => `same front as ${ids}`,
+      checkedBy: 'checked by the checker', inReview: 'in human review',
+      tally: { checked: 'checked', refuted: 'refuted', 'in-work': 'in work', conjecture: 'open', dead: 'dead' },
+      boardEmpty: 'No subagent matches that.',
+      seeLemmas: 'See the lemmas',
+      progCount: (n, k) => `${n} ${k}`,
+      writes: w => `writes ${w}`,
+      emptyMap2: 'the record below keeps every seat',
+      idle: 'No subagent is running this second.',
+    },
+  }[LANG];
+  const vocab = () => (snap.vocab && (snap.vocab[LANG] || snap.vocab)) || {};
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -13,22 +51,16 @@
     checked: 'checked', refuted: 'refuted', dead: 'dead', 'in-work': 'in-work',
     started: 'started', status: 'status', note: 'note', conjecture: 'conjecture',
   };
-  const STATUS_LABEL = {
-    checked: 'checked', refuted: 'refuted', 'in-work': 'in work',
-    conjecture: 'open', dead: 'dead',
-  };
+  const STATUS_LABEL = T.labels;
   let PROG = Object.fromEntries(snap.programs.map(p => [p.id, p]));
 
   const ago = iso => {
     const s = (new Date(snap.generated_at) - new Date(iso)) / 1000;
-    if (!isFinite(s) || s < 0) return 'now';
-    if (s < 90) return `${Math.max(1, Math.round(s))}s ago`;
-    if (s < 5400) return `${Math.round(s / 60)}m ago`;
-    if (s < 172800) return `${Math.round(s / 3600)}h ago`;
-    return `${Math.round(s / 86400)}d ago`;
+    if (!isFinite(s) || s < 0) return T.now;
+    return T.ago(s);
   };
   const chip = (kind, text) =>
-    `<span class="chip chip--${KIND[kind] || 'status'}"><i class="dot"></i>${text || kind}</span>`;
+    `<span class="chip chip--${KIND[kind] || 'status'}"><i class="dot"></i>${text || T.kinds[kind] || kind}</span>`;
 
   function countUp(node, to) {
     if (reduced) { node.textContent = fmt(to); return; }
@@ -54,7 +86,7 @@
 
   /* vocabulary: the same page reads lemmas in the seed and subagents when live */
   function renderVocab() {
-    const v = snap.vocab || {};
+    const v = vocab();
     $$('[data-vocab]').forEach(node => {
       const key = node.dataset.vocab;
       if (v[key]) node.textContent = v[key];
@@ -68,7 +100,7 @@
       const rows = snap.running?.length ? snap.running : (snap.activity || []);
       const limit = Number(root.dataset.limit || rows.length);
       if (!rows.length) {
-        root.innerHTML = `<li class="act-empty">${snap.vocab?.idle || 'No subagent is running this second.'}${snap.idle_since ? ` · last move ${ago(snap.idle_since)}` : ''}</li>`;
+        root.innerHTML = `<li class="act-empty">${vocab().idle || T.idle}${snap.idle_since ? ` · ${T.last} ${ago(snap.idle_since)}` : ''}</li>`;
         return;
       }
       root.innerHTML = rows.slice(0, limit).map(r => `
@@ -76,7 +108,7 @@
           <span class="act-id">${r.id}</span>
           <span class="act-front">${r.front ?? ''}</span>
           <span class="act-doing">${r.doing}</span>
-          <span class="act-meta">${r.steps ? 'step ' + r.steps : ''}${r.tools ? ' · ' + r.tools + ' calls' : ''}${r.steps || r.tools ? ' · ' : ''}${ago(r.lastAt)}</span>
+          <span class="act-meta">${r.steps ? T.step + r.steps + T.stepEnd : ''}${r.tools ? ' · ' + r.tools + T.calls : ''}${r.steps || r.tools ? ' · ' : ''}${ago(r.lastAt)}</span>
         </li>`).join('');
     });
   }
@@ -88,15 +120,20 @@
   function renderStatus() {
     $$('[data-status]').forEach(root => {
       const p = PROG[snap.status.program];
-      const text = String(snap.status.text ?? '');
+      const text = String(snap.status[LANG === 'zh' ? 'text_zh' : 'text_en'] ?? snap.status.text ?? '');
       const shown = text.length > 340 ? text.slice(0, 338) + ' …' : text;
+      const seat = snap.status.turn
+        ? (LANG === 'zh'
+            ? `主会话 · 第 ${snap.status.turn} 轮 · ${snap.status.subagents} 个子代理`
+            : `main · turn ${snap.status.turn} · ${snap.status.subagents} subagents`)
+        : (snap.status[LANG === 'zh' ? 'seat_zh' : 'seat_en'] || snap.status.seat || '');
       root.innerHTML = `
-        <div class="seat">${snap.status.seat}${p ? ' · ' + p.name + ' · ' + p.title : ''}</div>
+        <div class="seat">${seat}${p ? ' · ' + p.name + ' · ' + p.title : ''}</div>
         <p>${shown}</p>
         <div class="meta">
           <span>${ago(snap.status.at)}</span>
-          <span>as of ${String(snap.generated_at).slice(0, 16).replace('T', ' ')} UTC</span>
-          <span>${fmt(snap.counters.agents_working_now)} seats working now</span>
+          <span>${T.asOf(String(snap.generated_at).slice(0, 16).replace('T', ' '))}</span>
+          <span>${T.seats(fmt(snap.counters.agents_working_now))}</span>
         </div>`;
     });
   }
@@ -153,7 +190,7 @@
       const c = {};
       rows.forEach(l => { c[l.status] = (c[l.status] || 0) + 1; });
       const tally = ['checked', 'in-work', 'conjecture', 'refuted', 'dead']
-        .filter(k => c[k]).map(k => `${c[k]} ${STATUS_LABEL[k]}`).join(' · ');
+        .filter(k => c[k]).map(k => `${c[k]} ${T.tally[k]}`).join(' · ');
       return `<section class="prog-block" id="${p.id}">
         <header>
           <h2>${p.title ? p.name + ' · ' + p.title : p.name}</h2>
@@ -167,12 +204,12 @@
           <div>
             <h3>${l.title}</h3>
             <p>${l.note}</p>
-            ${l.doing ? `<div class="now${l.running ? ' now--live' : ''}">${l.running ? 'now' : 'last move'} · ${l.doing}</div>` : ''}
-            ${l.deps && l.deps.length ? `<div class="deps">same front as ${l.deps.join(' · ')}</div>` : ''}
+            ${l.doing ? `<div class="now${l.running ? ' now--live' : ''}">${l.running ? T.now : T.last} · ${l.doing}</div>` : ''}
+            ${l.deps && l.deps.length ? `<div class="deps">${T.sameFront(l.deps.join(' · '))}</div>` : ''}
           </div>
         </article>`).join('')}
       </section>`;
-    }).join('') + `<p class="board-empty" hidden>No subagent matches that.</p>`;
+    }).join('') + `<p class="board-empty" hidden>${T.boardEmpty}</p>`;
 
     const search = $('[data-board-search]');
     if (search) {
@@ -215,11 +252,11 @@
           <div class="aim">${p.aim}</div>
           <p>${p.goal}</p>
           <div class="pc-foot">
-            <span>${c('checked')} checked</span>
-            <span>${c('in-work')} in work</span>
-            <span>${c('refuted')} refuted</span>
-            <span>${c('dead')} dead</span>
-            <a href="board.html#${p.id}">See the lemmas</a>
+            <span>${c('checked')} ${T.tally.checked}</span>
+            <span>${c('in-work')} ${T.tally['in-work']}</span>
+            <span>${c('refuted')} ${T.tally.refuted}</span>
+            <span>${c('dead')} ${T.tally.dead}</span>
+            <a href="board.html#${p.id}">${T.seeLemmas}</a>
           </div>
         </article>`;
       }).join('');
@@ -236,7 +273,7 @@
             <h2>${pp.title}</h2>
             <p>${pp.blurb}</p>
             <div class="pmeta">
-              ${chip(pp.status === 'checked' ? 'checked' : 'in-work', pp.status === 'checked' ? 'checked by the checker' : 'in human review')}
+              ${chip(pp.status === 'checked' ? 'checked' : 'in-work', pp.status === 'checked' ? T.checkedBy : T.inReview)}
               <span>${prog ? prog.name + ' · ' + prog.title : ''}</span>
               <span>${pp.when}</span>
             </div>
@@ -303,11 +340,11 @@
         ctx.fillStyle = 'rgba(255,255,255,0.34)';
         ctx.font = '13px Inter, system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(snap.vocab?.idle || 'No subagent is running this second.', rect.width / 2, rect.height / 2);
+        ctx.fillText(vocab().idle || T.idle, rect.width / 2, rect.height / 2);
         if (snap.idle_since) {
           ctx.fillStyle = 'rgba(255,255,255,0.18)';
           ctx.font = '11px Inter, system-ui, sans-serif';
-          ctx.fillText(`last move ${ago(snap.idle_since)} · the record below keeps every seat`, rect.width / 2, rect.height / 2 + 22);
+          ctx.fillText(` ${T.last} ${ago(snap.idle_since)} · ${T.emptyMap2}`, rect.width / 2, rect.height / 2 + 22);
         }
       };
       paint();
@@ -535,12 +572,12 @@
         <div class="mc-id">${n.id} · ${p ? p.name + ' ' + p.title : ''}</div>
         <h3>${n.title}</h3>
         <p>${n.note}</p>
-        ${n.doing ? `<p class="mc-doing"><span>now</span> ${n.doing}</p>` : ''}
+        ${n.doing ? `<p class="mc-doing"><span>${T.now}</span> ${n.doing}</p>` : ''}
         <div class="mc-foot">
           ${chip(n.status, STATUS_LABEL[n.status])}
-          <span>${n.steps ? 'step ' + n.steps + ' · ' : ''}${n.lastAt ? ago(n.lastAt) : ''}</span>
+          <span>${n.steps ? T.step + n.steps + T.stepEnd + ' · ' : ''}${n.lastAt ? ago(n.lastAt) : ''}</span>
         </div>
-        ${n.wrote ? `<div class="mc-file">writes ${n.wrote}</div>` : ''}`;
+        ${n.wrote ? `<div class="mc-file">${T.writes(n.wrote)}</div>` : ''}`;
     }
 
     const ac = new AbortController();
@@ -656,7 +693,7 @@
 
   function liveChip(state) {
     $$('[data-live]').forEach(node => {
-      const v = snap.vocab || {};
+      const v = vocab();
       if (state === 'live') {
         node.innerHTML = `<i class="dot pulse"></i> ${v.live || 'live'} · ${ago(snap.generated_at)}`;
         node.className = 'chip chip--checked';
@@ -668,9 +705,10 @@
   }
 
   let failures = 0;
+  const liveUrl = new URL('live.json', (document.currentScript && document.currentScript.src) || location.href).href;
   async function pullLive() {
     try {
-      const res = await fetch(`live.json?t=${Date.now()}`, { cache: 'no-store' });
+      const res = await fetch(`${liveUrl}?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(String(res.status));
       const next = await res.json();
       failures = 0;

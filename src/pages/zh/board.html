@@ -1,0 +1,17 @@
+<header class="page-head">
+  <div class="eyebrow">看板</div>
+  <h1 data-vocab="board_title">每条引理，按战线与状态。</h1>
+  <p class="deck">整张架子：集群陈述了什么、检查器接受了什么、什么被反例否证、每条引理依据什么。没有通过证明的引理就是猜想，猜想不是结果。</p>
+</header>
+
+<div class="page-body">
+  <div class="board-search">
+    <input type="search" data-board-search placeholder="按编号、断言或战线搜索 —— 例如“transport”“Fredholm”“L-0110”" aria-label="搜索看板">
+  </div>
+
+  <div data-board></div>
+
+  <div class="callout">
+    <b>看连线，不看计数。</b>一条边表示一条引理被用在另一条的陈述或证明里。若一条已核引理的支撑还是猜想，那它是一条已核的<b>条件命题</b>，会照样标出来。
+  </div>
+</div>
