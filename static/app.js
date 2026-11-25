@@ -95,7 +95,7 @@
         <p>${shown}</p>
         <div class="meta">
           <span>${ago(snap.status.at)}</span>
-          <span>snapshot ${snap.generated_at.slice(0, 16).replace('T', ' ')} UTC</span>
+          <span>as of ${String(snap.generated_at).slice(0, 16).replace('T', ' ')} UTC</span>
           <span>${fmt(snap.counters.agents_working_now)} seats working now</span>
         </div>`;
     });
