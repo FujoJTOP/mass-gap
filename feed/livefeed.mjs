@@ -494,7 +494,7 @@ if (arg('write')) {
 
 if (arg('serve')) serve(Number(arg('serve')));
 
-if (arg('push')) {
+if (Number(arg('push', 0)) > 0) {
   let last = '';
   setInterval(() => {
     const s = write();
@@ -512,7 +512,7 @@ if (arg('push')) {
   console.log(`pages sync every ${arg('push')}s`);
 }
 
-if (!arg('serve') && !arg('write') && !arg('push')) {
+if (!arg('serve') && !arg('write') && !(Number(arg('push', 0)) > 0)) {
   const s = snapshot(true);
   console.log(JSON.stringify({
     counters: s.counters,
