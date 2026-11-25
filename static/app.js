@@ -321,7 +321,7 @@
 
     const nodes = snap.lemmas.map((l, i) => ({
       ...l,
-      r: RADIUS[l.status] || 5,
+      r: (RADIUS[l.status] || 5) * (snap.lemmas.length <= 5 ? 1.8 : 1),
       cx: 0, cy: 0,
       x: 0, y: 0, vx: 0, vy: 0,
     }));
@@ -331,6 +331,8 @@
 
     // anchor each program in a ring; jitter seeded so the map is stable across loads
     const r0 = nodes.length > 14 ? 330 : nodes.length > 5 ? 190 : 80;
+    const stage = canvas.parentElement;
+    stage.style.height = nodes.length <= 5 ? 'clamp(260px, 34vh, 360px)' : '';
     snap.programs.forEach((p, pi) => {
       const a = (pi / snap.programs.length) * Math.PI * 2 - Math.PI / 2;
       const cx = Math.cos(a) * r0, cy = Math.sin(a) * r0 * 0.62;
@@ -498,7 +500,7 @@
         }
 
         if (!dim && (n.r >= 8 || view.k > 1.2 || n === hovered || n === selected)) {
-          ctx.font = '10px Inter, system-ui, sans-serif';
+          ctx.font = `${snap.lemmas.length <= 5 ? 12 : 10}px Inter, system-ui, sans-serif`;
           ctx.textAlign = 'center';
           const label = n.title.length > 30 ? n.title.slice(0, 28) + '…' : n.title;
           const w = ctx.measureText(label).width;

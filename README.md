@@ -9,7 +9,28 @@ src/pages/*.html    one fragment per page — {{content}} goes inside the layout
 static/             site.css, app.js, join.txt (copied verbatim into dist/)
 data/snapshot.json  the record: counters, status, lemmas, events, papers, graveyard
 build.py            stdlib-only generator -> dist/
+feed/livefeed.mjs   live feed: reads a DSH session log, serves /live.json
 ```
+
+## Live mode — watch a real session solve
+
+`feed/livefeed.mjs` decodes a DSH session log (append-only, one zstd frame per record,
+including every subagent's own log) and serves it in the site's shape. The page polls
+`live.json` every 5 s and re-renders: map nodes are the **currently running** subagents,
+each with the command it is executing, its step count, and the file it is writing. Seats
+that stop running leave the map; the record below keeps every settled verdict.
+
+```sh
+python build.py                 # once, so dist/ exists
+feed\start.cmd                  # -> http://127.0.0.1:8123/
+# or directly:
+node feed/livefeed.mjs --serve=8123
+node feed/livefeed.mjs --serve=8123 --push=240   # + commit data/snapshot.json every 240 s
+```
+
+Defaults to the mass-gap session `session-e338ab7c…` under `~/.dsh/sessions/--D-Dev-math--`;
+override with `--id=<sessionId> --cwd=<folder>`. Verdict colours come from the session's own
+`[T] / [C] / [M] / [NG] / [E]` tags in each subagent's closing message.
 
 ## Build
 

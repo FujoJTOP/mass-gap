@@ -39,6 +39,7 @@ const iso = ms => isoFull(ms).slice(0, 19).replace('T', ' ');
 const strip = s => String(s ?? '')
   .replace(/<\|im_start\|>[\s\S]*/g, '')      // leaked control tokens: drop the tail
   .replace(/```[\s\S]*?```/g, ' ')
+  .replace(/\*\*|`|^#+\s*/gm, '')             // markdown emphasis noise
   .replace(/\s+/g, ' ')
   .trim();
 
